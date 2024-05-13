@@ -20,15 +20,19 @@ type EthBlockReq struct {
 
 func (c *EthController) GetBlockReceipts() {
 	req := &EthBlockReq{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, req)
-	fmt.Printf("req:%+v",req)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, req)
+	if err != nil{
+		utils.Error(c.Ctx, 400, err.Error())
+		return
+	}
+	fmt.Printf("req:%+v\n",req)
 	blockNum := big.NewInt(req.BlockNum)
 	receipts, err := config.EthClient.GetBlockReceipts(context.Background(), blockNum)
 	if err != nil{
 		utils.Error(c.Ctx, 400, err.Error())
 		return
 	}
-	fmt.Printf("res:%v",receipts)
+	fmt.Printf("res:%v\n",receipts)
 	utils.Success(c.Ctx, receipts, 0)
 	return
 }
